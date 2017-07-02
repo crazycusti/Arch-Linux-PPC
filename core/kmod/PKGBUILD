@@ -1,0 +1,52 @@
+# $Id: PKGBUILD 154255 2012-03-25 02:41:49Z dreisner $
+# Maintainer: Dave Reisner <dreisner@archlinux.org>
+# ppc Maintainer: Wynton Tietjen <crazycusti@googlemail.com>
+
+pkgname=kmod
+# pkgver=24 need C99 compiler
+pkgver=23
+pkgrel=1
+pkgdesc="Linux kernel module handling"
+arch=('i686' 'x86_64' 'ppc')
+url='http://git.kernel.org/?p=utils/kernel/kmod/kmod.git;a=summary'
+license=('GPL2')
+depends=('glibc' 'zlib')
+options=('!libtool')
+provides=('module-init-tools=3.16')
+conflicts=('module-init-tools')
+replaces=('module-init-tools')
+source=("https://www.kernel.org/pub/linux/utils/kernel/$pkgname/$pkgname-$pkgver.tar.xz")
+
+build() {
+  cd "$pkgname-$pkgver"
+
+  ./configure \
+    --sysconfdir=/etc \
+    --with-zlib \
+    --with-xz \
+    --disable-manpages
+  make
+}
+
+check() {
+  make -C "$pkgname-$pkgver" check
+}
+
+package() {
+  make -C "$pkgname-$pkgver" DESTDIR="$pkgdir" install
+
+  # extra directories
+  install -dm755 "$pkgdir"/{etc,lib}/{depmod,modprobe}.d "$pkgdir/sbin"
+
+  # add symlinks to kmod
+  ln -s ../usr/bin/kmod "$pkgdir/sbin/modprobe"
+  ln -s ../usr/bin/kmod "$pkgdir/sbin/depmod"
+
+  for tool in {ins,ls,rm}mod modinfo; do
+    ln -s kmod "$pkgdir/usr/bin/$tool"
+  done
+
+}
+
+# vim: ft=sh syn=sh et
+
