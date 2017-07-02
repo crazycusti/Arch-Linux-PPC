@@ -1,0 +1,33 @@
+# $Id: PKGBUILD 142188 2011-11-06 02:27:50Z stephane $
+# x86 Maintainer: tobias [ tobias at archlinux org ]
+# ppc Maintainer: Wynton Tietjen <crazycusti@googlemail.com>
+
+pkgname=vi
+pkgver=070224
+pkgrel=1
+epoch=1
+pkgdesc='The original ex/vi text editor.'
+arch=('ppc' 'i686' 'x86_64')
+url='http://ex-vi.sourceforge.net/'
+license=('custom:ex')
+depends=('ncurses')
+optdepends=('mailx: used by the preserve command for notification')
+groups=('base')
+options=(strip !libtool emptydirs)
+source=(http://sources.archlinux.org/other/vi/ex-${pkgver}.tar.xz)
+
+build() {
+  cd "${srcdir}/ex-${pkgver}"
+
+  make PREFIX=/usr LIBEXECDIR=/usr/lib/ex PRESERVEDIR=/var/lib/ex \
+      'FEATURES=-DCHDIR -DFASTTAG -DUCVISUAL -DMB -DBIT8' TERMLIB=ncurses
+}
+
+package() {
+  cd "${srcdir}/ex-${pkgver}"
+
+  make PREFIX=/usr LIBEXECDIR=/usr/lib/ex PRESERVEDIR=/var/lib/ex INSTALL=/bin/install \
+      DESTDIR="$pkgdir" install
+
+  install -D -m644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
