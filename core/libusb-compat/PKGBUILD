@@ -1,0 +1,27 @@
+# $Id: PKGBUILD 142816 2011-11-15 17:24:11Z andrea $
+# x86 Maintainer:
+# Contributor: Tobias Powalowski <tpowa@archlinux.org>
+# Contributor: arjan <arjan@archlinux.org>
+# ppc Maintainer: Wynton Tietjen <crazycusti@googlemail.com>
+
+pkgname=libusb-compat
+pkgver=0.1.5
+pkgrel=1
+pkgdesc="Library to enable user space application programs to communicate with USB devices"
+arch=('ppc' 'i686' 'x86_64')
+depends=('libusb' 'sh')
+url="http://libusb.sourceforge.net/"
+license=('LGPL')
+source=("http://downloads.sourceforge.net/${pkgname%-*}/${pkgname}-${pkgver%.*}/$pkgname-$pkgver/${pkgname}-${pkgver}.tar.bz2")
+options=('!libtool')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr 
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR=${pkgdir} install
+}
